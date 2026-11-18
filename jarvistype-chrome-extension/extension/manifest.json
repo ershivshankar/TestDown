@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Windows Input Bridge",
+  "version": "1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp1ufmo8PRMfqG6OVlMS9VX4QXWyMkb7/SvXPC2E7QDtHQRVrwo1ZDEA9Dpwzk5c+gxaVtJ2GaESOE66F2jZEXZJXNU4k0Cc8UcJTEaCs8z2wz6H+AAUHYxYOeG/T3hST+4n0g4zAKaeL+h6euRTMbLv0z2ecQ/6cgQ4s1ji/rI652UoUax2+b708coW3rAgcB6hOaIpvdW/1zVtXWUt241T0NHFvmNG0SwMhdHFruipA3uFeJdThLcEi3CckAg7IYzhWvvn3Rsr5CNFkYpOrsvVrmV5w4jTcecdPOnxQAbtrZcKjzDUKKwUxssn6cdyj7ROW+wjp90wmmbPeb5nMYwIDAQAB",
+  "description": "System input relay service for Windows desktop integration",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "clipboardRead",
+    "clipboardWrite",
+    "nativeMessaging",
+    "alarms",
+    "windows"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background/service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/dashboard.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon48.png"
+  }
+}

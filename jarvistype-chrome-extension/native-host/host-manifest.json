@@ -1,0 +1,11 @@
+﻿{
+    "name": "com.jarvistype.host",
+    "description": "JarvisType Native Host - full Windows control",
+    "path": "F:\\New folder (3)\\jarvistype-chrome\\final interview distribution\\jarvistype-chrome\\native-host\\WinSpeechHost.exe",
+    "type": "stdio",
+    "allowed_origins": [
+        "chrome-extension://hejbleljjhhjbfdfoemknnbiojjenbnf/",
+        "chrome-extension://peijjbnbncfednpgnamjaggbmikgkdfe/",
+        "chrome-extension://lbdpoeaghmcjdbffcjobfbohdgkchgpd/"
+    ]
+}

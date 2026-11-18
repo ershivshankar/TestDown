@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JarvisType</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <!-- ── LOGIN SCREEN ──────────────────────────────────────────────────── -->
+    <div id="login-screen" style="display:none">
+        <div class="login-wrap">
+            <div class="login-logo">🖥️</div>
+            <div class="login-title">JarvisType</div>
+            <div class="login-sub">Enter your access token to connect</div>
+            <input type="text" id="token-input" class="login-input" placeholder="Your token (e.g. ABC-123456)" autocomplete="off" spellcheck="false" />
+            <div id="login-error" class="login-error" style="display:none"></div>
+            <button id="btn-connect" class="login-btn">Connect →</button>
+        </div>
+    </div>
+
+    <!-- ── DASHBOARD ─────────────────────────────────────────────────────── -->
+    <div id="dashboard-screen" style="display:none">
+        <div class="header">
+            <div class="title">
+                <span class="icon">🖥️</span>
+                <span>JarvisType</span>
+            </div>
+            <div class="status-group">
+                <button id="btn-logout" class="logout-btn">↳ Logout</button>
+                <button id="btn-stream-toggle" class="stream-stop-btn" title="Stop streaming — mobile goes offline">⏹ Stop</button>
+                <div id="status-pill" class="status-pill offline">
+                    <span class="dot"></span>
+                    <span id="status-text">OFFLINE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <!-- DOWNLOAD PC HOST CARD -->
+            <div class="card host-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>💻</span>
+                        <span>PC HOST SETUP</span>
+                    </div>
+                </div>
+                <div class="host-desc">Required for full desktop control — mouse, keyboard, screen capture of all apps.</div>
+                <div class="host-row">
+                    <button id="btn-download-host" class="btn-host-download">⬇ Download PC Host</button>
+                    <span id="host-status-badge" class="host-badge disconnected">Not detected</span>
+                </div>
+            </div>
+
+            <!-- API KEYS CARD -->
+            <div class="card api-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>🗝️</span>
+                        <span>API KEYS</span>
+                    </div>
+                    <button id="btn-edit-keys" class="btn-sm">Edit Keys</button>
+                </div>
+
+                <div class="key-field">
+                    <label>GEMINI API KEY (G)</label>
+                    <div class="input-row">
+                        <input type="password" id="key-gemini" />
+                        <button id="btn-copy-gemini" class="btn btn-purple">Copy</button>
+                    </div>
+                </div>
+
+                <div class="key-field">
+                    <label>CHATGPT API KEY (C)</label>
+                    <div class="input-row">
+                        <input type="password" id="key-chatgpt" />
+                        <button id="btn-copy-chatgpt" class="btn btn-emerald">Copy</button>
+                    </div>
+                </div>
+
+                <div class="key-field">
+                    <label>CLAUDE API KEY</label>
+                    <div class="input-row">
+                        <input type="password" id="key-claude" />
+                        <button id="btn-copy-claude" class="btn btn-indigo">Copy</button>
+                    </div>
+                </div>
+
+                <div class="key-field">
+                    <label>GROK API KEY</label>
+                    <div class="input-row">
+                        <input type="password" id="key-grok" />
+                        <button id="btn-copy-grok" class="btn btn-orange">Copy</button>
+                    </div>
+                </div>
+
+                <div class="key-field">
+                    <label>GROQ API KEY</label>
+                    <div class="input-row">
+                        <input type="password" id="key-groq" />
+                        <button id="btn-copy-groq" class="btn btn-blue">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM LOGS -->
+            <div class="card" style="border-color:#374151;">
+                <div class="card-title" style="font-size:0.8rem;margin-bottom:8px;color:#94a3b8;">
+                    <span>📋</span>
+                    <span>System logs</span>
+                </div>
+                <div id="log-box" style="height:100px;overflow-y:scroll;background:#0a0a0f;border:1px solid #1e1e2d;font-family:monospace;font-size:10px;padding:8px;border-radius:8px;color:#a3e635;white-space:pre-wrap;word-break:break-all;">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="toast" class="toast">Copied!</div>
+    <script src="dashboard.js"></script>
+</body>
+</html>

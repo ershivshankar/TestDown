@@ -1,0 +1,398 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background-color: #070709;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    width: 380px;
+    min-height: 520px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: #0d0d12;
+    border-bottom: 1px solid #1a1a24;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #f1f5f9;
+}
+
+.status-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logout-btn {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.logout-btn:hover { opacity: 0.8; }
+
+.status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: 0.05em;
+}
+
+.status-pill.offline {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+.status-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 6px #4ade80;
+}
+.status-pill.offline .dot {
+    background: #f87171;
+    box-shadow: 0 0 6px #f87171;
+}
+
+.container {
+    max-width: 540px;
+    width: 100%;
+    margin: 24px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 16px;
+}
+
+.card {
+    background: #121219;
+    border: 1px solid #1e1e2d;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-row input {
+    flex: 1;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #f1f5f9;
+    font-size: 0.8rem;
+    font-family: monospace;
+    outline: none;
+}
+
+.input-row input:focus {
+    border-color: #3b82f6;
+}
+
+.btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn:active { transform: scale(0.97); }
+
+.btn-blue { background: #2563eb; color: #ffffff; }
+.btn-purple { background: #7c3aed; color: #ffffff; }
+.btn-emerald { background: #059669; color: #ffffff; }
+.btn-orange { background: #d97706; color: #ffffff; }
+.btn-indigo { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #ffffff; }
+
+.api-card {
+    background: #111122;
+    border-color: rgba(99, 102, 241, 0.25);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #f1f5f9;
+}
+
+.btn-sm {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-sm:hover { background: rgba(255, 255, 255, 0.15); }
+
+.key-field {
+    margin-bottom: 14px;
+}
+.key-field:last-child { margin-bottom: 0; }
+
+.key-field label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+}
+
+.send-card {
+    background: #0f1424;
+    border-color: rgba(59, 130, 246, 0.25);
+}
+
+.subtitle {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin: 6px 0 14px 0;
+}
+
+.bottom-bar {
+    text-align: center;
+    background: #111118;
+    border: 1px solid #1e1e2d;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* ── LOGIN SCREEN STYLES ── */
+#login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.login-wrap {
+    background: #121219;
+    border: 1px solid #1e1e2d;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.login-logo {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.login-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+}
+
+.login-sub {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-bottom: 24px;
+}
+
+.login-input {
+    width: 100%;
+    background: #09090d;
+    border: 1px solid #27273a;
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: #f8fafc;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.login-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.login-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.login-btn:hover {
+    opacity: 0.92;
+}
+
+.login-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.token-badge {
+    margin-top: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* ── Stream Stop/Start toggle ── */
+.stream-stop-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    transition: background 0.2s, border-color 0.2s;
+}
+.stream-stop-btn:hover { background: rgba(239, 68, 68, 0.2); }
+.stream-stop-btn.running {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+.stream-stop-btn.running:hover { background: rgba(34, 197, 94, 0.2); }
+
+/* ── PC Host Card ── */
+.host-card {
+    border-color: #1e3a5f;
+    background: linear-gradient(135deg, rgba(15,23,42,0.8), rgba(10,10,20,0.9));
+}
+.host-desc {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.host-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.btn-host-download {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    border: none;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    letter-spacing: 0.02em;
+}
+.btn-host-download:hover { opacity: 0.88; }
+.host-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+}
+.host-badge.connected {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+.host-badge.disconnected {
+    background: rgba(100, 116, 139, 0.12);
+    border: 1px solid rgba(100, 116, 139, 0.25);
+    color: #64748b;
+}

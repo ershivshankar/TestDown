@@ -1,0 +1,2623 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Permissions-Policy" content="microphone=*">
+<title>Interview Assistant</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: rgba(255, 255, 255, 0.22);
+    --card: rgba(255, 255, 255, 0.68);
+    --card-hover: rgba(255, 255, 255, 0.85);
+    --border: rgba(0, 0, 0, 0.09);
+    --border-light: rgba(0, 0, 0, 0.14);
+    --text: #18181c;
+    --text-dim: #3a3a46;
+    --text-muted: #5c5c6c;
+    --accent: #1d4ed8;
+    --accent-glow: rgba(29, 78, 216, 0.15);
+    --green: #065f46;
+    --green-glow: rgba(6, 95, 70, 0.12);
+    --red: #b91c1c;
+    --orange: #c2410c;
+    --purple: #6d28d9;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: transparent;
+    color: var(--text);
+    overflow: hidden;
+    user-select: text;
+    -webkit-app-region: no-drag;
+  }
+
+  .overlay-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .overlay-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid var(--border);
+    -webkit-app-region: drag;
+    cursor: grab;
+    min-height: 42px;
+    position: relative;
+    z-index: 100001;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-icon {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .header-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .header-btns {
+    display: flex;
+    gap: 6px;
+    -webkit-app-region: no-drag;
+  }
+
+  .header-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .header-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text);
+  }
+
+  .header-btn.close:hover {
+    background: rgba(248, 113, 113, 0.3);
+    color: var(--red);
+  }
+
+  /* ─── MODE TABS ─── */
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.38);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mode-tab {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+
+  .mode-tab:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--border-light);
+  }
+
+  .mode-tab.active {
+    background: rgba(29, 78, 216, 0.1);
+    border-color: rgba(29, 78, 216, 0.3);
+    color: var(--accent);
+  }
+
+  /* ─── STATUS BAR ─── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+  }
+
+  .status-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: background 0.3s;
+  }
+
+  .status-dot.recording {
+    background: var(--red);
+    box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+    animation: pulse-dot 1.5s infinite;
+  }
+
+  .status-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green-glow);
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    color: var(--text-dim);
+  }
+
+  .provider-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 10.5px;
+    padding: 3px 6px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .provider-select:focus {
+    border-color: var(--accent);
+  }
+
+  /* ─── RESUME BAR ─── */
+  .resume-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .resume-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+  }
+
+  .resume-info.loaded {
+    color: var(--green);
+  }
+
+  .resume-btn {
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-dim);
+    font-size: 10.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .resume-btn:hover {
+    background: rgba(79, 140, 255, 0.12);
+    border-color: rgba(79, 140, 255, 0.3);
+    color: var(--accent);
+  }
+
+  /* ─── Q&A AREA ─── */
+  .qa-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .qa-area::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .qa-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+  }
+
+  .qa-area::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+  }
+
+  .qa-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .qa-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: visible;
+    animation: card-in 0.3s ease;
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .qa-question {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .qa-question .q-label {
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .qa-answer {
+    padding: 8px 12px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .qa-answer pre {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0 0 6px 6px;
+    padding: 10px 12px;
+    margin: 0;
+    max-height: 280px;
+    overflow-x: auto;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Fira Mono', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre;
+    word-break: normal;
+  }
+
+  .qa-answer pre::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  .qa-answer pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+  }
+  .qa-answer pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .qa-answer pre::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .qa-answer p {
+    margin: 4px 0;
+    white-space: pre-wrap;
+  }
+
+  .copy-btn {
+    margin-left: auto;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: rgba(0,0,0,0.04);
+    color: var(--text-dim);
+    font-size: 10.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .copy-btn:hover {
+    background: rgba(52,211,153,0.12);
+    border-color: rgba(52,211,153,0.3);
+    color: var(--green);
+  }
+  .copy-btn.copied {
+    background: rgba(52,211,153,0.18);
+    border-color: rgba(52,211,153,0.4);
+    color: var(--green);
+  }
+
+  .qa-answer.loading {
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .qa-answer .generating-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  /* ─── AUTO-TYPE CONTROLS ─── */
+  .autotype-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.42);
+  }
+
+  .at-btn {
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-dim);
+    font-size: 10.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .at-btn:hover {
+    background: rgba(79, 140, 255, 0.12);
+    border-color: rgba(79, 140, 255, 0.3);
+    color: var(--accent);
+  }
+
+  .at-btn.typing {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: var(--red);
+  }
+
+  .at-btn.done {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: var(--green);
+    cursor: default;
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .speed-slider {
+    width: 50px;
+    height: 3px;
+    -webkit-appearance: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  /* ─── MANUAL INPUT ─── */
+  .manual-input-area {
+    display: none;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    gap: 6px;
+  }
+
+  .manual-input-area.visible {
+    display: flex;
+  }
+
+  .manual-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    resize: none;
+    min-height: 36px;
+    max-height: 80px;
+  }
+
+  .manual-input:focus {
+    border-color: rgba(79, 140, 255, 0.4);
+  }
+
+  .manual-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .send-btn {
+    padding: 8px 14px;
+    background: linear-gradient(135deg, var(--accent), #6366f1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .send-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+
+  .send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ─── GRAB BUTTON ─── */
+  .grab-area {
+    display: none;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    justify-content: center;
+  }
+
+  .grab-area.visible {
+    display: flex;
+  }
+
+  .grab-btn {
+    padding: 10px 28px;
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .grab-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+
+  .grab-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ─── BOTTOM BAR ─── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.38);
+  }
+
+  .bottom-btn {
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .bottom-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+  }
+
+  .bottom-btn.danger:hover {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--red);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+
+  /* ─── SETUP SCREEN ─── */
+  .setup-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 24px;
+    gap: 16px;
+  }
+
+  .setup-screen.hidden {
+    display: none;
+  }
+
+  .main-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .main-screen.hidden {
+    display: none;
+  }
+
+  .setup-title {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+
+  .setup-subtitle {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .setup-field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .setup-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .setup-select, .setup-input {
+    width: 100%;
+    padding: 9px 12px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 12.5px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .setup-select:focus, .setup-input:focus {
+    border-color: rgba(79, 140, 255, 0.4);
+  }
+
+  .setup-select option {
+    background: #ffffff;
+    color: #18181c;
+  }
+
+  .setup-save-btn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--accent), #6366f1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 6px;
+  }
+
+  .setup-save-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .setup-save-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .setup-error {
+    font-size: 11px;
+    color: var(--red);
+    text-align: center;
+    min-height: 16px;
+  }
+
+  /* ─── INTERIM TEXT ─── */
+  .interim-text {
+    padding: 6px 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    min-height: 24px;
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+
+  .interim-text.visible {
+    display: block;
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .empty-state .icon {
+    font-size: 28px;
+    opacity: 0.5;
+  }
+
+  /* ─── SETTINGS MODAL ─── */
+  .settings-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settings-overlay.visible {
+    display: flex;
+  }
+
+  .settings-modal {
+    background: rgba(255, 255, 255, 0.97);
+    color: var(--text);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 90%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .settings-modal h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ─── TRANSCRIPT INDICATOR ─── */
+  .transcript-live {
+    padding: 4px 14px 6px;
+    font-size: 11px;
+    color: var(--orange);
+    background: rgba(251, 146, 60, 0.06);
+    border-bottom: 1px solid var(--border);
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .transcript-live.visible {
+    display: flex;
+  }
+
+  .transcript-live .wave {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 12px;
+  }
+
+  .transcript-live .wave span {
+    width: 2px;
+    background: var(--orange);
+    border-radius: 2px;
+    animation: wave-bar 0.8s ease-in-out infinite;
+  }
+
+  .transcript-live .wave span:nth-child(1) { height: 4px; animation-delay: 0s; }
+  .transcript-live .wave span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+  .transcript-live .wave span:nth-child(3) { height: 5px; animation-delay: 0.3s; }
+  .transcript-live .wave span:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+
+  @keyframes wave-bar {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1.2); }
+  }
+
+
+
+  /* ─── PASTE-BASED MANUAL INPUT (stealth mode — no keyboard focus) ─── */
+  .paste-input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: 0 2px;
+  }
+
+  .paste-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .paste-btn {
+    flex: 1;
+    padding: 9px 12px;
+    background: linear-gradient(135deg, var(--accent), #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .paste-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .paste-btn:active { transform: translateY(0); }
+  .paste-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+  .paste-btn.secondary {
+    background: rgba(0,0,0,0.08);
+    color: var(--text);
+  }
+
+  .paste-preview {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 8px;
+    min-height: 0;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: none;
+  }
+  .paste-preview.has-text { display: block; }
+
+  /* ─── TWO-OPTION MANUAL INPUT ─── */
+  .manual-options {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .manual-opt-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+  .manual-opt-btn:hover {
+    background: rgba(255,255,255,0.07);
+    transform: translateY(-1px);
+  }
+  .manual-opt-btn.paste { border-color: var(--accent); }
+  .manual-opt-btn.paste:hover { border-color: var(--accent); background: rgba(59,130,246,0.1); }
+  .manual-opt-btn.type { border-color: var(--purple); }
+  .manual-opt-btn.type:hover { border-color: var(--purple); background: rgba(139,92,246,0.1); }
+  .manual-opt-btn.type.active { border-color: var(--orange); background: rgba(251,146,60,0.08); }
+
+  .opt-icon { font-size: 18px; line-height: 1; }
+  .opt-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .opt-sub { font-size: 9.5px; color: var(--text-muted); }
+
+  /* Typing panel — shown only when Type mode is active */
+  .typing-panel {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  .typing-panel.visible { display: flex; }
+
+  .typing-warn {
+    font-size: 9.5px;
+    color: var(--orange);
+    text-align: center;
+    background: rgba(251,146,60,0.06);
+    border: 1px solid rgba(251,146,60,0.2);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+  }
+
+  .manual-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 12px;
+    padding: 7px 9px;
+    resize: none;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  .manual-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="overlay-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">🎤</div>
+      <span class="header-title">Interview Assistant</span>
+    </div>
+    <div class="header-btns">
+      <div class="opacity-wrap" title="Adjust Window Opacity" style="display:flex;align-items:center;gap:3px;margin-right:4px;padding:2px 6px;background:rgba(0,0,0,0.05);border-radius:6px;">
+        <span style="font-size:11px;opacity:0.75;">&#128065;</span>
+        <input type="range" id="opacitySlider" min="20" max="100" value="95" style="width:48px;height:4px;accent-color:#1d4ed8;cursor:pointer;" oninput="onOpacityChange(this.value)">
+      </div>
+      <button class="header-btn" id="settingsBtn" title="Settings">&#9881;&#65039;</button>
+      <button class="header-btn close" id="closeBtn" onclick="onCloseOverlayClick(event)" title="Close">&#10005;</button>
+    </div>
+  </div>
+
+  
+
+  <!-- ═══ MAIN SCREEN ═══ -->
+  <div class="main-screen" id="mainScreen">
+
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="auto" id="tabAuto">🎤 Auto</button>
+      <button class="mode-tab" data-mode="manual" id="tabManual">✏️ Manual</button>
+      <button class="mode-tab" data-mode="grab" id="tabGrab">📸 Grab</button>
+    </div>
+
+    <!-- RESUME BAR -->
+    <div class="resume-bar">
+      <div class="resume-info" id="resumeInfo">
+        <span>📄</span>
+        <span id="resumeStatus">No resume uploaded</span>
+      </div>
+      <button class="resume-btn" id="uploadResumeBtn">Upload</button>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div class="status-left">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Ready</span>
+      </div>
+      <select class="provider-select" id="providerSelect">
+        <option value="gemini">Gemini 2.0</option>
+        <option value="openai">GPT-4o</option>
+        <option value="claude">Claude 3</option>
+        <option value="grok">xAI Grok</option>
+        <option value="groq">Groq Free</option>
+      </select>
+    </div>
+
+    <!-- LIVE TRANSCRIPT -->
+    <div class="transcript-live" id="transcriptLive">
+      <div class="wave"><span></span><span></span><span></span><span></span></div>
+      <span id="interimText">Listening...</span>
+    </div>
+
+    <!-- Q&A AREA -->
+    <div class="qa-area" id="qaArea">
+      <div class="empty-state" id="emptyState">
+        <div class="icon">🎯</div>
+        <div>Select a mode and start your interview</div>
+        <div style="font-size:10px;color:var(--text-muted)">Auto: voice • Manual: type • Grab: screenshot</div>
+      </div>
+    </div>
+
+    <!-- MANUAL INPUT -->
+    <div class="manual-input-area" id="manualInputArea" style="flex-direction:column;">
+      <!-- Image context strip shown when screenshot is attached -->
+      <div id="imgContextStrip" style="display:none; width:100%; background:rgba(29,78,216,0.08); border:1px solid rgba(29,78,216,0.2); border-radius:6px; padding:5px 8px; margin-bottom:5px; align-items:center; justify-content:space-between; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img id="imgContextThumb" style="height:28px; border-radius:4px; border:1px solid var(--border); object-fit:contain;" />
+          <span style="font-size:10.5px; color:var(--accent); font-weight:500;">📎 Screenshot attached — ask a follow-up question</span>
+        </div>
+        <button id="clearImgContextBtn" style="border:none; background:transparent; color:var(--red); cursor:pointer; font-size:12px; padding:2px 5px; border-radius:4px; flex-shrink:0;" title="Remove attached screenshot">✕</button>
+      </div>
+
+      <!-- TWO INPUT OPTIONS -->
+      <div class="manual-options">
+        <!-- Option 1: Paste from clipboard (zero detection) -->
+        <button class="manual-opt-btn paste" id="pasteAskBtn">
+          <span class="opt-icon">📋</span>
+          <span class="opt-label">Paste &amp; Ask</span>
+          <span class="opt-sub">from clipboard</span>
+        </button>
+        <!-- Option 2: Type manually (temporarily enables keyboard) -->
+        <button class="manual-opt-btn type" id="enableTypeBtn">
+          <span class="opt-icon">✏️</span>
+          <span class="opt-label">Type</span>
+          <span class="opt-sub">manually</span>
+        </button>
+      </div>
+
+      <!-- Paste preview strip -->
+      <div class="paste-preview" id="pastePreview"></div>
+
+      <!-- Typing panel (shown only when typing mode is active) -->
+      <div class="typing-panel" id="typingPanel">
+        <textarea class="manual-input" id="manualInput" placeholder="Type your question..." rows="3"></textarea>
+        <div style="display:flex; gap:6px;">
+          <button class="paste-btn" id="sendTypeBtn">Send</button>
+          <button class="paste-btn secondary" id="cancelTypeBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAB AREA -->
+    <div class="grab-area" id="grabArea">
+      <button class="grab-btn" id="grabBtn">📸 Grab Screen</button>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <button class="bottom-btn" id="toggleBtn">🎤 Start</button>
+      <button class="bottom-btn danger" id="clearBtn">🗑 Clear</button>
+    </div>
+
+  </div>
+</div>
+
+
+
+<script>
+/* global chrome */
+// ═══════════════════════════════════════════════════════════
+// 🎤 AI INTERVIEW ASSISTANT — Chrome Extension Version
+// ═══════════════════════════════════════════════════════════
+
+// Build a local interviewAPI object replacing all Electron IPC
+// Standalone API â€” localStorage + direct fetch
+const API = {
+  saveAiConfig: async (config) => {
+    try {
+      localStorage.setItem('ia_config', JSON.stringify(config));
+      const map = { gemini:'geminiKey', openai:'chatgptKey', claude:'claudeKey', grok:'grokKey', groq:'groqKey' };
+      const k = map[config.provider];
+      if (k && config.apiKey) localStorage.setItem(k, config.apiKey);
+      if (config.groqKey)     localStorage.setItem('groqKey', config.groqKey);
+    } catch(e) {}
+  },
+  loadAiConfig: async () => {
+    try {
+      const raw  = localStorage.getItem('ia_config');
+      const base = raw ? JSON.parse(raw) : {};
+      const gm  = localStorage.getItem('geminiKey');
+      const gpt = localStorage.getItem('chatgptKey');
+      const cl  = localStorage.getItem('claudeKey');
+      const grk = localStorage.getItem('grokKey');
+      const grq = localStorage.getItem('groqKey');
+      if (gm)  base._geminiKey  = gm;
+      if (gpt) base._openaiKey  = gpt;
+      if (cl)  base._claudeKey  = cl;
+      if (grk) base._grokKey    = grk;
+      if (grq) base._groqKey    = grq;
+      return base;
+    } catch(e) { return {}; }
+  },
+  getUserApiKeys: async () => {
+    return {
+      gemini: localStorage.getItem('geminiKey')  || '',
+      chatgpt:localStorage.getItem('chatgptKey') || '',
+      claude: localStorage.getItem('claudeKey')  || '',
+      grok:   localStorage.getItem('grokKey')    || '',
+      groq:   localStorage.getItem('groqKey')    || '',
+    };
+  },
+  generateAnswer: async (data) => {
+    const { question, provider, apiKey, resumeText, screenshot } = data;
+    const model = data.model || data.__model;
+    const systemPrompt = screenshot
+      ? `You are an expert interview and exam assistant. When analyzing a screenshot, ALWAYS provide the DIRECT ANSWER or SOLUTION at the very beginning. If multiple choice, state the correct option first. If coding, write the solution code. Be concise and professional.`
+      : `You are an expert interview assistant. Give professional, confident, and concise answers (3-6 sentences for behavioral, full solution for technical). Reference the resume context when relevant.`;
+    const resumeContext = resumeText ? `\n\nCandidate Resume:\n${resumeText.substring(0, 3000)}` : '';
+    try {
+            if (provider === 'gemini') {
+        let m = model || 'gemini-2.5-flash';
+        if (m === 'gemini-2.0-flash' || m === 'gemini-2.5-pro' || m === 'gemini-1.5-pro' || m === 'gemini-1.5-flash') {
+          m = 'gemini-2.5-flash';
+        }
+        const parts = [{ text: systemPrompt + resumeContext + '\n\nQuestion: ' + question }];
+        if (screenshot) parts.push({ inline_data: { mime_type: 'image/jpeg', data: screenshot.split(',')[1] } });
+        let resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + m + ':generateContent?key=' + apiKey, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts }] })
+        });
+        let d = await resp.json();
+        // Automatic fallback to gemini-2.5-flash if selected model is unavailable
+        if (!d.candidates && m !== 'gemini-2.5-flash') {
+          resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          d = await resp.json();
+        }
+        const answer = d.candidates?.[0]?.content?.parts?.[0]?.text;
+        return answer ? { answer } : { error: d.error?.message || 'No response from Gemini' };
+      }
+      if (provider === 'groq') {
+        let m = model || 'llama-3.1-8b-instant';
+        if (m === 'llama-3.3-70b-versatile') m = 'llama-3.1-8b-instant';
+        const messages = [{ role: 'system', content: systemPrompt + resumeContext }, { role: 'user', content: question }];
+        let resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+          body: JSON.stringify({ model: m, messages })
+        });
+        let d = await resp.json();
+        // Fallback to llama-3.1-8b-instant if needed
+        if (d.error && m !== 'llama-3.1-8b-instant') {
+          resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+            body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages })
+          });
+          d = await resp.json();
+        }
+        const answer = d.choices?.[0]?.message?.content;
+        return answer ? { answer } : { error: d.error?.message || 'No response from Groq' };
+      }
+      if (provider === 'openai') {
+        const m = model || 'gpt-4o';
+        const messages = [{ role: 'system', content: systemPrompt + resumeContext }];
+        const userMsg = screenshot
+          ? { role: 'user', content: [{ type: 'text', text: question }, { type: 'image_url', image_url: { url: screenshot } }] }
+          : { role: 'user', content: question };
+        messages.push(userMsg);
+        const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({ model: m, messages })
+        });
+        const d = await resp.json();
+        const answer = d.choices?.[0]?.message?.content;
+        return answer ? { answer } : { error: d.error?.message || 'No response from OpenAI' };
+      }
+      if (provider === 'claude') {
+        const m = model || 'claude-3-5-sonnet-20241022';
+        const messages = [{ role: 'user', content: screenshot
+          ? [{ type: 'text', text: systemPrompt + resumeContext + '\n\nQuestion: ' + question },
+             { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: screenshot.split(',')[1] } }]
+          : systemPrompt + resumeContext + '\n\nQuestion: ' + question
+        }];
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+          body: JSON.stringify({ model: m, max_tokens: 1024, messages })
+        });
+        const d = await resp.json();
+        const answer = d.content?.[0]?.text;
+        return answer ? { answer } : { error: d.error?.message || 'No response from Claude' };
+      }
+      if (provider === 'grok') {
+        const m = model || 'grok-2';
+        const messages = [{ role: 'system', content: systemPrompt + resumeContext }, { role: 'user', content: question }];
+        const resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({ model: m, messages })
+        });
+        const d = await resp.json();
+        const answer = d.choices?.[0]?.message?.content;
+        return answer ? { answer } : { error: d.error?.message || 'No response from Grok' };
+      }
+      return { error: 'Unknown provider: ' + provider };
+    } catch(e) {
+      return { error: e.message };
+    }
+  },
+  grabScreen: async () => {
+    return new Promise((resolve, reject) => {
+      const handler = (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          if (d.type === 'grab-screen-result') {
+            window.chrome.webview.removeEventListener('message', handler);
+            if (d.image) resolve(d.image);
+            else reject(new Error(d.error || 'Grab failed'));
+          }
+        } catch(ex) {}
+      };
+      if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.addEventListener('message', handler);
+        window.chrome.webview.postMessage(JSON.stringify({ type: 'grab-screen' }));
+        setTimeout(() => {
+          window.chrome.webview.removeEventListener('message', handler);
+          reject(new Error('Grab timeout'));
+        }, 10000);
+      } else {
+        reject(new Error('No host'));
+      }
+    });
+  },
+  transcribeAudio: async (audioArrayBuffer, apiKey) => {
+    const blob = new Blob([audioArrayBuffer], { type: 'audio/webm' });
+    const form = new FormData();
+    form.append('file', blob, 'audio.webm');
+    form.append('model', 'whisper-large-v3-turbo');
+    form.append('response_format', 'json');
+    const resp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` }, body: form
+    });
+    const d = await resp.json();
+    return { text: d.text || '' };
+  },
+  uploadResume: async () => {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.txt,.pdf,.doc,.docx';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return resolve(null);
+        const text = await file.text();
+        resolve({ text: text.substring(0, 8000), name: file.name });
+      };
+      input.click();
+    });
+  },
+  autoTypeStart: (data) => {
+    try { window.chrome.webview.postMessage(JSON.stringify({ type: 'autotype-start', text: data.text })); } catch(e) {}
+  },
+  autoTypeStop: () => {
+    try { window.chrome.webview.postMessage(JSON.stringify({ type: 'autotype-stop' })); } catch(e) {}
+  },
+  autoTypeSpeed: (speed) => {
+    try { window.chrome.webview.postMessage(JSON.stringify({ type: 'autotype-speed', speed })); } catch(e) {}
+  },
+  onAutoTypeProgress: (callback) => {
+    try {
+      window.chrome.webview.addEventListener('message', e => {
+        try { const d = JSON.parse(e.data); if (d.type === 'autotype-progress') callback(d); } catch(ex) {}
+      });
+    } catch(e) {}
+  },
+  readClipboard: async () => {
+    try { return await navigator.clipboard.readText(); } catch(e) { return ''; }
+  },
+  enableTyping:  async () => {},
+  disableTyping: async () => {},
+  closeOverlay: () => {
+    try { window.chrome.webview.postMessage(JSON.stringify({ type: 'close' })); }
+    catch(e) { window.close(); }
+  },
+  onUserKeysUpdated: (callback) => {
+    window.addEventListener('storage', e => {
+      const keys = {};
+      if (e.key === 'geminiKey')  keys.geminiKey  = e.newValue;
+      if (e.key === 'chatgptKey') keys.chatgptKey = e.newValue;
+      if (e.key === 'claudeKey')  keys.claudeKey  = e.newValue;
+      if (e.key === 'grokKey')    keys.grokKey    = e.newValue;
+      if (e.key === 'groqKey')    keys.groqKey    = e.newValue;
+      if (Object.keys(keys).length) callback(keys);
+    });
+  },
+  scanPage: async () => ({ text: '', error: 'standalone mode' }),
+};
+
+function onOpacityChange(val) {
+  const norm = val / 100.0;
+  localStorage.setItem('ia_opacity', val);
+  try {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'set-opacity', opacity: norm.toString() }));
+    }
+  } catch(e) {}
+}
+
+function onCloseOverlayClick(e) {
+  if (e) e.stopPropagation();
+  try {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'close' }));
+    } else {
+      window.close();
+    }
+  } catch(ex) {
+    window.close();
+  }
+}
+
+// ─── STATE ───
+let state = {
+  mode: 'auto',        // auto | manual | grab
+  isRecording: false,
+  provider: 'gemini',
+  apiKey: '',
+  groqKey: '',         // Separate Groq key for Whisper speech-to-text
+  keys: {
+    gemini: '',
+    openai: '',
+    claude: '',
+    grok: '',
+    groq: ''
+  },
+  resumeText: '',
+  resumeName: '',
+  qaList: [],          // { question, answer, id }
+  autoTypeState: {},   // { [id]: { position, active, timer } }
+  lastScreenshot: null, // stores last grabbed screenshot for follow-up questions
+};
+
+// Audio variables moved to Auto mode section below
+
+// Helper to set provider and corresponding key
+function selectProvider(provider) {
+  state.provider = provider;
+  state.apiKey = state.keys[provider] || '';
+  
+  // Keep dropdown selects synchronized
+  const setupSelect = document.getElementById('setupProvider'); // legacy ref — element may not exist
+  if (setupSelect) setupSelect.value = provider;
+  const select = document.getElementById('providerSelect');
+  if (select) select.value = provider;
+  
+  API.saveAiConfig({
+    provider: (window.__ia_selectedProvider || state.provider),
+    apiKey: (state.keys[window.__ia_selectedProvider || state.provider] || state.apiKey),
+    groqKey: state.groqKey,
+    resumeText: state.resumeText,
+    resumeName: state.resumeName
+  }).catch(() => {});
+}
+
+// ─── INIT ───
+async function init() {
+  try {
+    const config = await API.loadAiConfig();
+    const dbKeys = await API.getUserApiKeys().catch(() => null);
+
+    // 1. Populate state keys cache
+    if (config) {
+      state.provider = config.provider || 'gemini';
+      state.resumeText = config.resumeText || '';
+      state.resumeName = config.resumeName || '';
+      state.groqKey = config.groqKey || '';
+      
+      state.keys.gemini = (config.provider === 'gemini' ? config.apiKey : '');
+      state.keys.openai = (config.provider === 'openai' ? config.apiKey : '');
+      state.keys.claude = (config.provider === 'claude' ? config.apiKey : '');
+      state.keys.grok   = (config.provider === 'grok'   ? config.apiKey : '');
+      state.keys.groq   = (config.provider === 'groq'   ? config.apiKey : '');
+
+      // Overlay extra fields from storage (prefixed with _)
+      if (config._geminiKey)  state.keys.gemini = config._geminiKey;
+      if (config._openaiKey)  state.keys.openai = config._openaiKey;
+      if (config._claudeKey)  state.keys.claude = config._claudeKey;
+      if (config._grokKey)    state.keys.grok   = config._grokKey;
+      if (config._groqKey) {
+        state.keys.groq = config._groqKey;
+        if (!state.groqKey) state.groqKey = config._groqKey;
+      }
+    }
+
+    if (dbKeys) {
+      if (dbKeys.gemini)  state.keys.gemini = dbKeys.gemini;
+      if (dbKeys.chatgpt) state.keys.openai = dbKeys.chatgpt;
+      if (dbKeys.claude)  state.keys.claude = dbKeys.claude;
+      if (dbKeys.grok) {
+        state.keys.grok = dbKeys.grok;
+        if (dbKeys.grok.startsWith('gsk_')) {
+          state.keys.groq = dbKeys.grok;
+          state.groqKey = dbKeys.grok;
+        } else if (dbKeys.grok.startsWith('xai-')) {
+          state.keys.grok = dbKeys.grok;
+          // also allow fallback if user had selected groq
+          state.keys.groq = dbKeys.grok;
+        }
+      }
+      if (dbKeys.groq) {
+        state.keys.groq = dbKeys.groq;
+        if (!state.groqKey) state.groqKey = dbKeys.groq;
+      }
+    }
+
+    // 2. Select initial provider key
+    state.apiKey = state.keys[state.provider] || '';
+
+    // If still no key for selected provider, look for any available key in cache to fail open
+    if (!state.apiKey) {
+      if (state.keys.gemini) {
+        state.provider = 'gemini';
+        state.apiKey = state.keys.gemini;
+      } else if (state.keys.openai) {
+        state.provider = 'openai';
+        state.apiKey = state.keys.openai;
+      } else if (state.keys.grok) {
+        state.provider = 'grok';
+        state.apiKey = state.keys.grok;
+      } else if (state.keys.groq) {
+        state.provider = 'groq';
+        state.apiKey = state.keys.groq;
+      } else if (state.keys.claude) {
+        state.provider = 'claude';
+        state.apiKey = state.keys.claude;
+      }
+    }
+
+    // 3. Show main screen if active key is present, otherwise setup screen
+    if (state.apiKey) {
+      showMainScreen();
+    } else {
+      showSetupScreen();
+      await API.enableTyping();
+    }
+  } catch(e) {
+    showSetupScreen();
+    await API.enableTyping();
+  }
+
+  // 🔄 REAL-TIME KEY SYNC: Listen for API key updates pushed from the dashboard
+  if (API.onUserKeysUpdated) {
+    API.onUserKeysUpdated((keys) => {
+      if (!keys) return;
+      
+      if (keys.geminiKey)  state.keys.gemini = keys.geminiKey;
+      if (keys.chatgptKey) state.keys.openai = keys.chatgptKey;
+      if (keys.claudeKey)  state.keys.claude = keys.claudeKey;
+      if (keys.grokKey) {
+        state.keys.grok = keys.grokKey;
+        state.keys.groq = keys.grokKey;
+        if (keys.grokKey.startsWith('gsk_')) {
+          state.groqKey = keys.grokKey;
+        }
+      }
+      if (keys.groqKey) {
+        state.keys.groq = keys.groqKey;
+        state.groqKey = keys.groqKey;
+      }
+
+      // Update current active key
+      state.apiKey = state.keys[state.provider] || '';
+
+      // If key is now available, auto-bypass setup screen
+      if (state.apiKey && document.getElementById('mainScreen').classList.contains('hidden')) {
+        showMainScreen();
+        API.disableTyping().catch(() => {});
+      }
+    });
+  }
+}
+
+function showSetupScreen() {
+  // Never block main screen — just show a prompt in status bar
+  showMainScreen();
+  var st = document.getElementById('statusText');
+  if (st) st.textContent = 'No API key — click ⚙ Settings to configure';
+}
+
+function showMainScreen() {
+  const ss = document.getElementById('setupScreen'); if (ss) ss.classList.add('hidden');
+  document.getElementById('ia-setup').style.display = 'none';
+  document.getElementById('mainScreen').classList.remove('hidden');
+  document.getElementById('providerSelect').value = state.provider;
+  updateResumeUI();
+}
+
+// ─── MODE TABS ───
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.mode = tab.dataset.mode;
+    updateModeUI();
+  });
+});
+
+function updateModeUI() {
+  const manualArea = document.getElementById('manualInputArea');
+  const grabArea = document.getElementById('grabArea');
+  const toggleBtn = document.getElementById('toggleBtn');
+
+  manualArea.classList.remove('visible');
+  grabArea.classList.remove('visible');
+
+  if (state.mode === 'auto') {
+    toggleBtn.style.display = '';
+  } else if (state.mode === 'manual') {
+    manualArea.classList.add('visible');
+    toggleBtn.style.display = 'none';
+    stopRecording();
+  } else if (state.mode === 'grab') {
+    grabArea.classList.add('visible');
+    manualArea.classList.add('visible'); // also show manual input for follow-up questions
+    toggleBtn.style.display = 'none';
+    stopRecording();
+  }
+}
+
+// ─── RESUME UPLOAD ───
+document.getElementById('uploadResumeBtn').addEventListener('click', async () => {
+  try {
+    const result = await API.uploadResume();
+    if (result && result.text) {
+      state.resumeText = result.text;
+      state.resumeName = result.name;
+      updateResumeUI();
+      await API.saveAiConfig({ 
+        provider: (window.__ia_selectedProvider || state.provider), 
+        apiKey: (state.keys[window.__ia_selectedProvider || state.provider] || state.apiKey), 
+        resumeText: state.resumeText,
+        resumeName: state.resumeName 
+      });
+    }
+  } catch(e) {
+    console.error('Resume upload failed:', e);
+  }
+});
+
+function updateResumeUI() {
+  const info = document.getElementById('resumeInfo');
+  const status = document.getElementById('resumeStatus');
+  if (state.resumeName) {
+    info.classList.add('loaded');
+    status.textContent = state.resumeName + ' ✓';
+  } else {
+    info.classList.remove('loaded');
+    status.textContent = 'No resume uploaded';
+  }
+}
+
+// ─── PROVIDER CHANGE ───
+document.getElementById('providerSelect').addEventListener('change', (e) => {
+  selectProvider(e.target.value);
+});
+
+// ─── AUTO MODE: MediaRecorder + VAD + Whisper ───
+let audioContext = null;
+let analyser = null;
+let mediaStream = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let vadInterval = null;
+let isSpeaking = false;
+let silenceStart = 0;
+let speechStart = 0;
+const SPEECH_THRESHOLD = 0.015;    // Audio level threshold for voice detection
+const SILENCE_DURATION = 2000;     // 2 seconds of silence = question done
+const MIN_SPEECH_DURATION = 500;   // Minimum speech duration to process (ms)
+
+function startRecording() {
+  if (state.isRecording) return;
+  
+  // Check if Groq key is available for Whisper
+  const whisperKey = state.groqKey || state.apiKey;
+  if (!whisperKey) {
+    setStatus('Need Groq API key for voice!', false);
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ 
+    audio: { 
+      echoCancellation: true, 
+      noiseSuppression: true, 
+      autoGainControl: true 
+    } 
+  }).then(stream => {
+    mediaStream = stream;
+    
+    // Setup audio analysis for VAD
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.3;
+    source.connect(analyser);
+    
+    // Setup MediaRecorder for audio capture
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    audioChunks = [];
+    
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        audioChunks.push(e.data);
+      }
+    };
+    
+    mediaRecorder.onstop = async () => {
+      if (audioChunks.length === 0) return;
+      
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      audioChunks = [];
+      
+      // Only process if blob has meaningful data (> 1KB)
+      if (audioBlob.size < 1000) return;
+      
+      setStatus('Transcribing...', true);
+      showInterim('🎙️ Processing speech...');
+      
+      try {
+        const arrayBuffer = await audioBlob.arrayBuffer();
+        const whisperKey = state.groqKey || state.apiKey;
+        const result = await API.transcribeAudio(arrayBuffer, whisperKey);
+        
+        if (result && result.text && result.text.length > 2) {
+          // Filter out noise / non-speech
+          const text = result.text.trim();
+          const noisePatterns = [
+            /^\.+$/, /^,+$/, /^\s*$/, 
+            /^(uh|um|hmm|ah|oh|okay)\.?$/i,
+            /^you$/i, /^thank you\.?$/i,
+            /^bye\.?$/i, /^hello\.?$/i
+          ];
+          
+          const isNoise = noisePatterns.some(p => p.test(text));
+          
+          if (!isNoise && text.length > 5) {
+            hideInterim();
+            processQuestion(text);
+          } else {
+            hideInterim();
+          }
+        } else {
+          hideInterim();
+        }
+      } catch(e) {
+        console.error('Transcription error:', e);
+        hideInterim();
+      }
+      
+      setStatus('Listening...', true);
+      
+      // Restart recording for next utterance if still in recording mode
+      if (state.isRecording && mediaRecorder && mediaRecorder.state === 'inactive') {
+        audioChunks = [];
+        try { mediaRecorder.start(100); } catch(e) {}
+      }
+    };
+    
+    // Start recording
+    mediaRecorder.start(100); // collect data every 100ms
+    
+    // Start Voice Activity Detection loop
+    const dataArray = new Float32Array(analyser.fftSize);
+    isSpeaking = false;
+    silenceStart = 0;
+    
+    vadInterval = setInterval(() => {
+      analyser.getFloatTimeDomainData(dataArray);
+      
+      // Calculate RMS (Root Mean Square) for audio level
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i] * dataArray[i];
+      }
+      const rms = Math.sqrt(sum / dataArray.length);
+      
+      if (rms > SPEECH_THRESHOLD) {
+        // Speech detected
+        if (!isSpeaking) {
+          isSpeaking = true;
+          speechStart = Date.now();
+          showInterim('🎙️ Detecting speech...');
+        }
+        silenceStart = 0; // Reset silence timer
+        showInterim('🎙️ Speaking... (will process when you pause)');
+      } else {
+        // Silence
+        if (isSpeaking) {
+          if (silenceStart === 0) {
+            silenceStart = Date.now();
+          }
+          
+          const silenceDuration = Date.now() - silenceStart;
+          const speechDuration = Date.now() - speechStart;
+          
+          if (silenceDuration >= SILENCE_DURATION && speechDuration >= MIN_SPEECH_DURATION) {
+            // Speech ended — stop recording, process audio
+            isSpeaking = false;
+            silenceStart = 0;
+            
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+              mediaRecorder.stop(); // This triggers onstop → transcription
+            }
+          } else if (silenceDuration > 500) {
+            showInterim('🎙️ Waiting for pause...');
+          }
+        }
+      }
+    }, 100); // Check every 100ms
+    
+    state.isRecording = true;
+    updateRecordingUI(true);
+    
+  }).catch(err => {
+    console.error('Microphone error:', err);
+    setStatus('Mic access denied!', false);
+  });
+}
+
+function stopRecording() {
+  if (!state.isRecording) return;
+  state.isRecording = false;
+  
+  // Stop VAD
+  if (vadInterval) {
+    clearInterval(vadInterval);
+    vadInterval = null;
+  }
+  
+  // Stop MediaRecorder
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try { mediaRecorder.stop(); } catch(e) {}
+  }
+  mediaRecorder = null;
+  
+  // Stop audio context
+  if (audioContext) {
+    try { audioContext.close(); } catch(e) {}
+    audioContext = null;
+  }
+  
+  // Stop media stream
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+  }
+  
+  audioChunks = [];
+  isSpeaking = false;
+  hideInterim();
+  updateRecordingUI(false);
+}
+
+function showInterim(text) {
+  document.getElementById('transcriptLive').classList.add('visible');
+  document.getElementById('interimText').textContent = text;
+}
+
+function hideInterim() {
+  document.getElementById('transcriptLive').classList.remove('visible');
+}
+
+function updateRecordingUI(recording) {
+  const dot = document.getElementById('statusDot');
+  const btn = document.getElementById('toggleBtn');
+  
+  if (recording) {
+    dot.classList.add('recording');
+    btn.textContent = '⏹ Stop';
+    setStatus('Listening...', true);
+  } else {
+    dot.classList.remove('recording');
+    btn.textContent = '🎤 Start';
+    setStatus('Ready', false);
+  }
+}
+
+function setStatus(text, active) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  if (active) dot.classList.add('active');
+  else dot.classList.remove('active');
+}
+
+
+
+// ─── TOGGLE BUTTON ───
+document.getElementById('toggleBtn').addEventListener('click', () => {
+  if (state.isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+
+// ─── MANUAL MODE: Option 1 — Paste & Ask (zero detection, always safe) ───
+document.getElementById('pasteAskBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('pasteAskBtn');
+  const preview = document.getElementById('pastePreview');
+  btn.style.opacity = '0.5';
+
+  try {
+    const text = await API.readClipboard();
+    if (!text || !text.trim()) {
+      btn.querySelector('.opt-sub').textContent = 'nothing copied!';
+      setTimeout(() => { btn.querySelector('.opt-sub').textContent = 'from clipboard'; }, 1500);
+      btn.style.opacity = '';
+      return;
+    }
+    const question = text.trim();
+    preview.textContent = '📋 ' + question.substring(0, 90) + (question.length > 90 ? '…' : '');
+    preview.classList.add('has-text');
+    processQuestion(question);
+    setTimeout(() => preview.classList.remove('has-text'), 3000);
+  } catch(e) {
+    console.error('Paste error:', e);
+  }
+
+  btn.style.opacity = '';
+});
+
+// ─── MANUAL MODE: Option 2 — Type manually (temporarily enables keyboard) ───
+let typingModeActive = false;
+
+async function enterTypingMode() {
+  if (typingModeActive) return;
+  typingModeActive = true;
+
+  const typeBtn = document.getElementById('enableTypeBtn');
+  const panel = document.getElementById('typingPanel');
+  const input = document.getElementById('manualInput');
+
+  typeBtn.classList.add('active');
+  typeBtn.querySelector('.opt-sub').textContent = 'active';
+  panel.classList.add('visible');
+
+  await API.enableTyping();
+  input.value = '';
+  input.focus();
+}
+
+async function exitTypingMode() {
+  if (!typingModeActive) return;
+  typingModeActive = false;
+
+  const typeBtn = document.getElementById('enableTypeBtn');
+  const panel = document.getElementById('typingPanel');
+
+  typeBtn.classList.remove('active');
+  typeBtn.querySelector('.opt-sub').textContent = 'manually';
+  panel.classList.remove('visible');
+
+  await API.disableTyping();
+}
+
+document.getElementById('enableTypeBtn').addEventListener('click', () => {
+  if (typingModeActive) {
+    exitTypingMode();
+  } else {
+    enterTypingMode();
+  }
+});
+
+document.getElementById('sendTypeBtn').addEventListener('click', async () => {
+  const input = document.getElementById('manualInput');
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = '';
+  await exitTypingMode();
+  processQuestion(question);
+});
+
+document.getElementById('cancelTypeBtn').addEventListener('click', () => {
+  exitTypingMode();
+});
+
+document.getElementById('manualInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    document.getElementById('sendTypeBtn').click();
+  }
+  if (e.key === 'Escape') {
+    exitTypingMode();
+  }
+});
+
+// ─── GRAB MODE ───
+document.getElementById('grabBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('grabBtn');
+  btn.disabled = true;
+  btn.textContent = '📸 Capturing...';
+
+  try {
+    const screenshot = await API.grabScreen();
+    if (screenshot) {
+      // Store screenshot for follow-up manual questions
+      state.lastScreenshot = screenshot;
+      showImgContext(screenshot);
+
+      const id = addQACard('📸 Screen captured — analyzing...', null, screenshot);
+      // Direct-answer prompt: force the AI to give solution first, not just describe
+      generateAnswer(id,
+        'Analyze this screenshot carefully. Identify the main question, problem, coding task, or exam question shown. Provide the DIRECT ANSWER or SOLUTION immediately at the start of your response. If it is multiple choice, state the correct option letter and text first. If it is a coding problem, write the solution code. If it is a math problem, compute the answer. Do not just describe or explain the image — give the actual answer/solution.',
+        screenshot
+      );
+    }
+  } catch(e) {
+    console.error('Grab failed:', e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '📸 Grab Screen';
+});
+
+function showImgContext(screenshot) {
+  const strip = document.getElementById('imgContextStrip');
+  const thumb = document.getElementById('imgContextThumb');
+  if (strip && thumb) {
+    thumb.src = screenshot;
+    strip.style.display = 'flex';
+  }
+}
+
+function clearImgContext() {
+  state.lastScreenshot = null;
+  const strip = document.getElementById('imgContextStrip');
+  if (strip) strip.style.display = 'none';
+  const thumb = document.getElementById('imgContextThumb');
+  if (thumb) thumb.src = '';
+}
+
+document.getElementById('clearImgContextBtn').addEventListener('click', clearImgContext);
+
+// ─── PROCESS QUESTION ───
+function processQuestion(question) {
+  document.getElementById('emptyState')?.remove();
+  // If a screenshot is attached (from Grab mode), include it with manual questions
+  const attachedScreenshot = state.lastScreenshot || null;
+  const id = addQACard(question, null, attachedScreenshot);
+  generateAnswer(id, question, attachedScreenshot);
+  // Clear the attached screenshot context after sending
+  if (attachedScreenshot) clearImgContext();
+}
+
+// ─── ADD Q&A CARD ───
+function addQACard(question, answer, screenshot = null) {
+  const id = 'qa-' + Date.now();
+  const qaArea = document.getElementById('qaArea');
+  
+  const emptyState = document.getElementById('emptyState');
+  if (emptyState) emptyState.style.display = 'none';
+
+  const card = document.createElement('div');
+  card.className = 'qa-card';
+  card.id = id;
+  card.innerHTML = `
+    <div class="qa-question">
+      <span class="q-label">Q:</span>
+      <span>${escapeHtml(question)}</span>
+    </div>
+    <div class="qa-answer loading" id="${id}-answer">
+      <span class="generating-dots">Generating answer</span>
+    </div>
+    <div class="autotype-bar" id="${id}-autotype" style="display:none">
+      <button class="at-btn" id="${id}-typeBtn" onclick="startAutoType('${id}')">&#9654; Type</button>
+      <div class="speed-control">
+        <span>Speed:</span>
+        <input type="range" class="speed-slider" id="${id}-speed" min="1" max="20" value="3" title="Typing speed (chars/sec)">
+        <span id="${id}-speedVal">3/s</span>
+      </div>
+    </div>
+  `;
+
+  qaArea.appendChild(card);
+  qaArea.scrollTop = qaArea.scrollHeight;
+
+  state.qaList.push({ id, question, answer: null, screenshot });
+  return id;
+}
+
+// ─── GENERATE ANSWER ───
+function formatAnswer(rawText) {
+  if (!rawText) return '';
+  const text = rawText.replace(/\r\n/g, '\n');
+  const regex = /```([a-zA-Z0-9_+#-]*)\n?([\s\S]*?)(?:```|$)/g;
+  let lastIndex = 0;
+  let html = '';
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const before = text.substring(lastIndex, match.index);
+    if (before.trim()) {
+      html += '<p style="margin:4px 0;">' + escapeHtml(before.trim()).replace(/\n/g, '<br>') + '</p>';
+    }
+    const lang = (match[1] || 'CODE').trim().toUpperCase();
+    const code = (match[2] || '').trim();
+    if (code) {
+      html += '<div style="margin:6px 0;border:1px solid rgba(0,0,0,0.12);border-radius:6px;overflow:hidden;background:rgba(255,255,255,0.4);"><div style="display:flex;align-items:center;justify-content:space-between;padding:3px 8px;background:rgba(0,0,0,0.06);font-size:10px;font-weight:bold;color:var(--accent);border-bottom:1px solid rgba(0,0,0,0.08);"><span>💻 ' + escapeHtml(lang) + '</span></div><pre><code>' + escapeHtml(code) + '</code></pre></div>';
+    }
+    lastIndex = regex.lastIndex;
+    if (match.index === regex.lastIndex) regex.lastIndex++;
+  }
+
+  const remaining = text.substring(lastIndex);
+  if (remaining.trim()) {
+    html += '<p style="margin:4px 0;">' + escapeHtml(remaining.trim()).replace(/\n/g, '<br>') + '</p>';
+  }
+
+  return html || '<p style="margin:4px 0;">' + escapeHtml(text).replace(/\n/g, '<br>') + '</p>';
+}
+
+async function generateAnswer(id, question, screenshot = null) {
+  const qaArea = document.getElementById('qaArea');
+  try {
+    setStatus('Generating answer...', true);
+    
+    const result = await API.generateAnswer({
+      question,
+      provider: (window.__ia_selectedProvider || state.provider),
+      apiKey: (state.keys[window.__ia_selectedProvider || state.provider] || state.apiKey),
+      resumeText: state.resumeText,
+      screenshot: screenshot || null,
+      model: (window.__ia_selectedModel || state.selectedModel || null),
+    });
+
+    const answerEl = document.getElementById(id + '-answer');
+    const autotypeBar = document.getElementById(id + '-autotype');
+
+    if (result && result.answer) {
+      answerEl.classList.remove('loading');
+      answerEl.innerHTML = '<strong style="color:var(--green);margin-right:4px;">A:</strong>' + formatAnswer(result.answer);
+      autotypeBar.style.display = 'flex';
+      
+      // Store answer in state
+      const qa = state.qaList.find(q => q.id === id);
+      if (qa) qa.answer = result.answer;
+
+      if (qaArea) qaArea.scrollTop = qaArea.scrollHeight;
+    } else {
+      answerEl.classList.remove('loading');
+      const errDetail = result && result.error ? `: ${result.error}` : ' (No response)';
+      answerEl.innerHTML = `<span style="color:var(--red)">Failed to generate answer${escapeHtml(errDetail)}. Check your API key.</span>`;
+    }
+  } catch(e) {
+    const answerEl = document.getElementById(id + '-answer');
+    answerEl.classList.remove('loading');
+    answerEl.innerHTML = '<span style="color:var(--red)">Error: ' + escapeHtml(e.message || 'Unknown error') + '</span>';
+  }
+
+  setStatus('Ready', false);
+  if (qaArea) qaArea.scrollTop = qaArea.scrollHeight;
+}
+
+// ─── AUTO-TYPE ───
+function startAutoType(id) {
+  const qa = state.qaList.find(q => q.id === id);
+  if (!qa || !qa.answer) return;
+
+  const btn = document.getElementById(id + '-typeBtn');
+  const speedSlider = document.getElementById(id + '-speed');
+  
+  if (state.autoTypeState[id] && state.autoTypeState[id].active) {
+    // STOP
+    state.autoTypeState[id].active = false;
+    btn.className = 'at-btn';
+    btn.textContent = '▶ Start';
+    btn.setAttribute('onclick', `startAutoType('${id}')`);
+    API.autoTypeStop();
+    return;
+  }
+
+  const position = (state.autoTypeState[id] && state.autoTypeState[id].position) || 0;
+  const speed = parseInt(speedSlider.value) || 3;
+  const remainingText = qa.answer.substring(position);
+
+  if (!remainingText) {
+    btn.className = 'at-btn done';
+    btn.textContent = '✓ Done';
+    return;
+  }
+
+  state.autoTypeState[id] = { position, active: true };
+  btn.className = 'at-btn typing';
+  btn.textContent = '⏹ Stop';
+
+  API.autoTypeStart({
+    text: remainingText,
+    speed: speed,
+    id: id
+  });
+}
+
+// Listen for auto-type progress updates from main process
+if (API.onAutoTypeProgress) {
+  API.onAutoTypeProgress((data) => {
+    if (data.id && state.autoTypeState[data.id]) {
+      state.autoTypeState[data.id].position = (state.autoTypeState[data.id].position || 0) + data.typed;
+    }
+    if (data.done) {
+      const btn = document.getElementById(data.id + '-typeBtn');
+      if (btn) {
+        btn.className = 'at-btn done';
+        btn.textContent = '✓ Done';
+        state.autoTypeState[data.id].active = false;
+      }
+    }
+    if (data.stopped) {
+      const btn = document.getElementById(data.id + '-typeBtn');
+      if (btn) {
+        btn.className = 'at-btn';
+        btn.textContent = '▶ Start';
+        state.autoTypeState[data.id].active = false;
+      }
+    }
+  });
+}
+
+// Speed slider changes
+document.addEventListener('input', (e) => {
+  if (e.target.classList.contains('speed-slider')) {
+    const id = e.target.id.replace('-speed', '');
+    const valEl = document.getElementById(id + '-speedVal');
+    if (valEl) valEl.textContent = e.target.value + '/s';
+    API.autoTypeSpeed(parseInt(e.target.value));
+  }
+});
+
+// ─── CLEAR ───
+document.getElementById('clearBtn').addEventListener('click', () => {
+  state.qaList = [];
+  state.autoTypeState = {};
+  audioChunks = [];
+  const qaArea = document.getElementById('qaArea');
+  qaArea.innerHTML = `
+    <div class="empty-state" id="emptyState">
+      <div class="icon">🎯</div>
+      <div>Select a mode and start your interview</div>
+      <div style="font-size:10px;color:var(--text-muted)">Auto: voice • Manual: type • Grab: screenshot</div>
+    </div>
+  `;
+});
+
+// ─── CLOSE ───
+document.getElementById('closeBtn').addEventListener('click', () => {
+  stopRecording();
+  API.closeOverlay();
+});
+
+// ─── UTILS ───
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ─── START ───
+init();
+</script>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- SETUP & SETTINGS MODAL                                    -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<style>
+#ia-setup {
+  position:fixed; top:42px; left:0; right:0; bottom:0; z-index:99999;
+  background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  display:flex; flex-direction:column;
+  padding:0; overflow-y:auto; font-family:'Inter',system-ui,sans-serif;
+  box-sizing:border-box;
+}
+#ia-setup .su-header {
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  background:rgba(255,255,255,0.8);
+  position:sticky; top:0; z-index:2;
+  display:flex; align-items:center; justify-content:space-between;
+}
+#ia-setup h2 {
+  margin:0 0 2px; font-size:14px; font-weight:700; color:#18181c; letter-spacing:-.3px;
+}
+#ia-setup p.su-sub { margin:0; font-size:11px; color:#5c5c6c; }
+.su-back-btn {
+  width:26px; height:26px; border:none; border-radius:6px;
+  background:rgba(0,0,0,0.06); color:#333; font-size:13px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .15s; font-family:inherit;
+}
+.su-back-btn:hover { background:rgba(0,0,0,0.12); color:#000; }
+#ia-setup .su-body { padding:12px 16px 20px; display:flex; flex-direction:column; gap:8px; }
+.su-provider-row {
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  background:rgba(0,0,0,0.025); border:1px solid rgba(0,0,0,0.08);
+  border-radius:9px; padding:8px 10px;
+}
+.su-provider-row.verified { border-color:rgba(5,150,105,0.4); background:rgba(5,150,105,0.04); }
+.su-provider-row.error    { border-color:rgba(185,28,28,0.3); background:rgba(185,28,28,0.04); }
+.su-icon { font-size:15px; width:22px; text-align:center; flex-shrink:0; }
+.su-label { font-size:12px; font-weight:600; color:#18181c; min-width:60px; }
+.su-key-wrap { flex:1; display:flex; gap:6px; align-items:center; min-width:140px; }
+.su-key-wrap input {
+  flex:1; padding:5px 8px; border:1px solid rgba(0,0,0,0.12);
+  border-radius:6px; font-size:11px; background:#fff;
+  color:#18181c; outline:none; font-family:inherit;
+}
+.su-key-wrap input:focus { border-color:#1d4ed8; box-shadow:0 0 0 2px rgba(29,78,216,0.12); }
+.su-verify-btn {
+  padding:4px 8px; font-size:10.5px; border:1px solid rgba(0,0,0,0.15);
+  border-radius:5px; background:#fff; color:#3a3a46; cursor:pointer;
+  white-space:nowrap; transition:all .15s; font-family:inherit; font-weight:500;
+}
+.su-verify-btn:hover { background:#f3f4f6; }
+.su-verify-btn.verifying { opacity:.5; pointer-events:none; }
+.su-status { font-size:11px; min-width:16px; text-align:center; }
+.su-models-found { font-size:10px; color:#065f46; width:100%; margin-top:2px; font-weight:500; }
+.su-error-msg    { font-size:10px; color:#b91c1c; width:100%; margin-top:2px; }
+#ia-setup .su-footer {
+  padding:10px 16px;
+  border-top:1px solid rgba(0,0,0,0.08);
+  background:rgba(255,255,255,0.8);
+  position:sticky; bottom:0;
+}
+.su-save-btn {
+  width:100%; padding:8px 12px; font-size:12px; font-weight:600;
+  background:linear-gradient(135deg,#1d4ed8,#6d28d9);
+  color:#fff; border:none; border-radius:8px; cursor:pointer;
+  font-family:inherit; transition:opacity .15s;
+}
+.su-save-btn:disabled { opacity:.4; cursor:not-allowed; }
+.su-save-btn:not(:disabled):hover { opacity:.9; }
+.su-note { font-size:10px; color:#5c5c6c; text-align:center; margin-top:6px; margin-bottom:0; }
+</style>
+
+<div id="ia-setup" style="display:none">
+  <div class="su-header">
+    <div>
+      <h2>&#127908; AI Provider Settings</h2>
+      <p class="su-sub">Enter API key to auto-detect models</p>
+    </div>
+    <button class="su-back-btn" onclick="suClose()" title="Close Settings">&#10005;</button>
+  </div>
+  <div class="su-body">
+    <!-- Gemini -->
+    <div class="su-provider-row" id="su-row-gemini">
+      <span class="su-icon">&#10024;</span>
+      <span class="su-label">Gemini</span>
+      <div class="su-key-wrap">
+        <input type="password" id="su-key-gemini" placeholder="AIzaSy..." autocomplete="off">
+        <button class="su-verify-btn" onclick="suVerify('gemini')">Verify</button>
+      </div>
+      <span class="su-status" id="su-st-gemini"></span>
+    </div>
+    <!-- Groq -->
+    <div class="su-provider-row" id="su-row-groq">
+      <span class="su-icon">&#9889;</span>
+      <span class="su-label">Groq</span>
+      <div class="su-key-wrap">
+        <input type="password" id="su-key-groq" placeholder="gsk_..." autocomplete="off">
+        <button class="su-verify-btn" onclick="suVerify('groq')">Verify</button>
+      </div>
+      <span class="su-status" id="su-st-groq"></span>
+    </div>
+    <!-- OpenAI -->
+    <div class="su-provider-row" id="su-row-openai">
+      <span class="su-icon">&#129302;</span>
+      <span class="su-label">OpenAI</span>
+      <div class="su-key-wrap">
+        <input type="password" id="su-key-openai" placeholder="sk-..." autocomplete="off">
+        <button class="su-verify-btn" onclick="suVerify('openai')">Verify</button>
+      </div>
+      <span class="su-status" id="su-st-openai"></span>
+    </div>
+    <!-- Claude -->
+    <div class="su-provider-row" id="su-row-claude">
+      <span class="su-icon">&#129504;</span>
+      <span class="su-label">Claude</span>
+      <div class="su-key-wrap">
+        <input type="password" id="su-key-claude" placeholder="sk-ant-..." autocomplete="off">
+        <button class="su-verify-btn" onclick="suVerify('claude')">Verify</button>
+      </div>
+      <span class="su-status" id="su-st-claude"></span>
+    </div>
+    <!-- Grok -->
+    <div class="su-provider-row" id="su-row-grok">
+      <span class="su-icon">&#127744;</span>
+      <span class="su-label">xAI Grok</span>
+      <div class="su-key-wrap">
+        <input type="password" id="su-key-grok" placeholder="xai-..." autocomplete="off">
+        <button class="su-verify-btn" onclick="suVerify('grok')">Verify</button>
+      </div>
+      <span class="su-status" id="su-st-grok"></span>
+    </div>
+  </div>
+  <div class="su-footer">
+    <button class="su-save-btn" id="su-save-btn" onclick="suSave()">Save & Start &#8594;</button>
+    <p class="su-note">Keys stored locally on your device only</p>
+  </div>
+</div>
+
+<script>
+// Verified state per provider
+const suVerified = { gemini:false, groq:false, openai:false, claude:false, grok:false };
+const suModels   = {}; // { gemini:[{id,label}], groq:[...], ... }
+
+// Curated Top Models per provider
+const suDiscover = {
+    gemini: async (key) => {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + key);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const raw = (d.models || []).map(m => m.name.replace('models/',''));
+    const list = [];
+    if (raw.includes('gemini-2.5-flash')) list.push({ id:'gemini-2.5-flash', label:'Gemini 2.5 Flash' });
+    if (raw.includes('gemini-3.7-flash')) list.push({ id:'gemini-3.7-flash', label:'Gemini 3.7 Flash' });
+    if (raw.includes('gemini-3.5-flash')) list.push({ id:'gemini-3.5-flash', label:'Gemini 3.5 Flash' });
+    if (list.length === 0) list.push({ id:'gemini-2.5-flash', label:'Gemini 2.5 Flash' }, { id:'gemini-3.7-flash', label:'Gemini 3.7 Flash' });
+    return list;
+  },
+  groq: async (key) => {
+    const r = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: { Authorization: 'Bearer ' + key }
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const raw = (d.data || []).map(m => m.id);
+    const list = [];
+    if (raw.includes('llama-3.1-8b-instant')) list.push({ id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' });
+    if (raw.includes('llama3-70b-8192'))     list.push({ id:'llama3-70b-8192',     label:'Llama 3 70B' });
+    if (raw.includes('llama3-8b-8192'))      list.push({ id:'llama3-8b-8192',      label:'Llama 3 8B' });
+    if (list.length === 0) list.push({ id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' }, { id:'llama3-70b-8192', label:'Llama 3 70B' });
+    return list;
+  },
+  openai: async (key) => {
+    const r = await fetch('https://api.openai.com/v1/models', {
+      headers: { Authorization: 'Bearer ' + key }
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return [
+      { id:'gpt-4o',      label:'GPT-4o' },
+      { id:'gpt-4o-mini', label:'GPT-4o Mini' },
+      { id:'o3-mini',     label:'o3-mini' }
+    ];
+  },
+  claude: async (key) => {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01' },
+      body:JSON.stringify({ model:'claude-3-haiku-20240307', max_tokens:1, messages:[{role:'user',content:'hi'}] })
+    });
+    if (r.status === 401) throw new Error('Invalid key');
+    return [
+      { id:'claude-3-5-sonnet-20241022', label:'Claude 3.5 Sonnet' },
+      { id:'claude-3-5-haiku-20241022',  label:'Claude 3.5 Haiku' },
+    ];
+  },
+  grok: async (key) => {
+    try {
+      const r = await fetch('https://api.x.ai/v1/models', { headers:{ Authorization:'Bearer ' + key } });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+    } catch(e) {}
+    return [
+      { id:'grok-2',      label:'Grok 2' },
+      { id:'grok-3-mini', label:'Grok 3 Mini' },
+    ];
+  },
+};
+
+async function suVerify(provider) {
+  const input = document.getElementById('su-key-' + provider);
+  const btn   = input.parentElement.querySelector('.su-verify-btn');
+  const st    = document.getElementById('su-st-' + provider);
+  const row   = document.getElementById('su-row-' + provider);
+  const key   = input.value.trim();
+  if (!key) { st.textContent=''; row.className='su-provider-row'; return; }
+
+  btn.textContent='...'; btn.classList.add('verifying');
+  st.textContent='...'; row.className='su-provider-row';
+
+  try {
+    const models = await suDiscover[provider](key);
+    suVerified[provider] = true;
+    suModels[provider]   = models;
+    st.textContent='&#10004;';
+    row.className='su-provider-row verified';
+    let noteEl = row.querySelector('.su-models-found');
+    if (!noteEl) { noteEl=document.createElement('div'); noteEl.className='su-models-found'; row.appendChild(noteEl); }
+    noteEl.textContent = models.map(m => m.label).join(' â€¢ ');
+    let errEl = row.querySelector('.su-error-msg');
+    if (errEl) errEl.remove();
+  } catch(err) {
+    suVerified[provider] = false;
+    delete suModels[provider];
+    st.textContent='&#10008;'; row.className='su-provider-row error';
+    let errEl = row.querySelector('.su-error-msg');
+    if (!errEl) { errEl=document.createElement('div'); errEl.className='su-error-msg'; row.appendChild(errEl); }
+    errEl.textContent = 'Error: ' + (err.message || 'Failed');
+    let noteEl = row.querySelector('.su-models-found');
+    if (noteEl) noteEl.remove();
+  }
+
+  btn.textContent='Verify'; btn.classList.remove('verifying');
+  updateSaveButtonState();
+}
+
+function updateSaveButtonState() {
+  const hasAnyKey = ['gemini','groq','openai','claude','grok'].some(p => {
+    const val = document.getElementById('su-key-' + p).value.trim();
+    return val.length > 5;
+  });
+  document.getElementById('su-save-btn').disabled = !hasAnyKey;
+}
+
+function suClose() {
+  document.getElementById('ia-setup').style.display = 'none';
+}
+
+async function suSave() {
+  const btn = document.getElementById('su-save-btn');
+  btn.textContent='Saving...'; btn.disabled=true;
+
+  const providers = ['gemini','groq','openai','claude','grok'];
+  const keyMap = { gemini:'geminiKey', groq:'groqKey', openai:'chatgptKey', claude:'claudeKey', grok:'grokKey' };
+  
+  providers.forEach(p => {
+    const key = document.getElementById('su-key-' + p).value.trim();
+    if (key && !key.startsWith('â—')) {
+      localStorage.setItem(keyMap[p], key);
+      if (!suModels[p]) {
+        if (p === 'gemini') suModels[p] = [{ id:'gemini-2.5-flash', label:'Gemini 2.5 Flash' }, { id:'gemini-3.7-flash', label:'Gemini 3.7 Flash' }];
+        if (p === 'groq')   suModels[p] = [{ id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' }, { id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' }];
+        if (p === 'openai') suModels[p] = [{ id:'gpt-4o', label:'GPT-4o' }, { id:'gpt-4o-mini', label:'GPT-4o Mini' }];
+        if (p === 'claude') suModels[p] = [{ id:'claude-3-5-sonnet-20241022', label:'Claude 3.5 Sonnet' }, { id:'claude-3-5-haiku-20241022', label:'Claude 3.5 Haiku' }];
+        if (p === 'grok')   suModels[p] = [{ id:'grok-2', label:'Grok 2' }, { id:'grok-3-mini', label:'Grok 3 Mini' }];
+      }
+    }
+  });
+
+  localStorage.setItem('ia_models', JSON.stringify(suModels));
+  localStorage.setItem('ia_setup_done', '1');
+
+  // Choose first configured provider
+  const firstProvider = Object.keys(suModels)[0] || 'gemini';
+  const firstKey = localStorage.getItem(keyMap[firstProvider]) || '';
+  
+  localStorage.setItem('ia_config', JSON.stringify({
+    provider: firstProvider,
+    apiKey:   firstKey,
+    groqKey:  localStorage.getItem('groqKey') || '',
+    resumeText:'', resumeName:''
+  }));
+
+  rebuildModelDropdown();
+  document.getElementById('ia-setup').style.display = 'none';
+}
+
+function rebuildModelDropdown() {
+  const stored = localStorage.getItem('ia_models');
+  let models = {};
+  if (stored) { try { models = JSON.parse(stored); } catch(e) {} }
+
+  if (Object.keys(models).length === 0) {
+    if (localStorage.getItem('geminiKey'))  models.gemini = [{ id:'gemini-2.5-flash', label:'Gemini 2.5 Flash' }, { id:'gemini-3.7-flash', label:'Gemini 3.7 Flash' }];
+    if (localStorage.getItem('groqKey'))    models.groq   = [{ id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' }, { id:'llama-3.1-8b-instant', label:'Llama 3.1 8B' }];
+    if (localStorage.getItem('chatgptKey')) models.openai = [{ id:'gpt-4o', label:'GPT-4o' }, { id:'gpt-4o-mini', label:'GPT-4o Mini' }];
+    if (localStorage.getItem('claudeKey'))  models.claude = [{ id:'claude-3-5-sonnet-20241022', label:'Claude 3.5 Sonnet' }, { id:'claude-3-5-haiku-20241022', label:'Claude 3.5 Haiku' }];
+    if (localStorage.getItem('grokKey'))    models.grok   = [{ id:'grok-2', label:'Grok 2' }, { id:'grok-3-mini', label:'Grok 3 Mini' }];
+  }
+
+  const sel = document.getElementById('providerSelect');
+  if (!sel) return;
+  sel.innerHTML = '';
+
+  const providerLabels = { gemini:'Gemini', groq:'Groq', openai:'OpenAI', claude:'Claude', grok:'Grok' };
+  let firstVal = null;
+  Object.entries(models).forEach(([provider, mlist]) => {
+    if (!mlist || !mlist.length) return;
+    const grp = document.createElement('optgroup');
+    grp.label = providerLabels[provider] || provider;
+    mlist.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = provider + '::' + m.id;
+      opt.textContent = m.label;
+      if (!firstVal) firstVal = opt.value;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  });
+
+  if (firstVal) {
+    sel.value = firstVal;
+    applySelectedModel(firstVal);
+  }
+
+  sel.onchange = function() {
+    applySelectedModel(this.value);
+  };
+}
+
+function applySelectedModel(val) {
+  if (val && val.includes('::')) {
+    const [provider, modelId] = val.split('::');
+    const keyMap = { gemini:'geminiKey', groq:'groqKey', openai:'chatgptKey', claude:'claudeKey', grok:'grokKey' };
+    const key = localStorage.getItem(keyMap[provider]) || '';
+    if (typeof state !== 'undefined') {
+      state.provider = provider;
+      state.apiKey = key;
+      state.selectedModel = modelId;
+      if (state.keys) state.keys[provider] = key;
+    }
+    window.__ia_selectedModel    = modelId;
+    window.__ia_selectedProvider = provider;
+  }
+}
+
+// Hook dragging, resizing, opacity, and settings
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore opacity
+  const savedOp = localStorage.getItem('ia_opacity') || '95';
+  const slider = document.getElementById('opacitySlider');
+  if (slider) {
+    slider.value = savedOp;
+    onOpacityChange(savedOp);
+  }
+
+  // Header drag
+  const header = document.querySelector('.header');
+  if (header) {
+    header.addEventListener('mousedown', (e) => {
+      if (!e.target.closest('button') && !e.target.closest('input') && !e.target.closest('select')) {
+        try { window.chrome.webview.postMessage(JSON.stringify({ type: 'drag' })); } catch(ex) {}
+      }
+    });
+  }
+
+  // Corner resize grip
+  const grip = document.getElementById('cornerResizeGrip');
+  if (grip) {
+    grip.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      try { window.chrome.webview.postMessage(JSON.stringify({ type: 'resize-start', direction: 17 })); } catch(ex) {}
+    });
+  }
+
+  // Always show main screen
+  const mainScreen = document.getElementById('mainScreen');
+  if (mainScreen) mainScreen.classList.remove('hidden');
+  const oldSetup = document.getElementById('setupScreen');
+  if (oldSetup) oldSetup.remove();
+
+  // First time boot check
+  const setupDone = localStorage.getItem('ia_setup_done');
+  const hasAnyKey = ['geminiKey','groqKey','chatgptKey','claudeKey','grokKey'].some(k => !!localStorage.getItem(k));
+
+  if (!setupDone && !hasAnyKey) {
+    document.getElementById('ia-setup').style.display = 'flex';
+  } else {
+    rebuildModelDropdown();
+  }
+
+  // Settings button hook
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('ia-setup').style.display = 'flex';
+      ['gemini','groq','openai','claude','grok'].forEach(p => {
+        const keyMap = { gemini:'geminiKey', groq:'groqKey', openai:'chatgptKey', claude:'claudeKey', grok:'grokKey' };
+        const saved = localStorage.getItem(keyMap[p]);
+        const inp = document.getElementById('su-key-' + p);
+        if (saved && inp) { inp.value = saved; }
+      });
+      document.getElementById('su-save-btn').textContent = 'Update & Save &#8594;';
+      updateSaveButtonState();
+    });
+  }
+});
+</script>
+</body>
+</html>
