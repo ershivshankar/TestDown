@@ -6,29 +6,27 @@
 
 ## ⬇️ Download the Extension
 
-Choose your preferred format:
-
-| Format | Description | Link |
-|--------|-------------|------|
-| 📦 **ZIP (Compressed)** | Single file, easy to share | [⬇ Download ZIP](https://github.com/ershivshankar/TestDown/raw/main/jarvistype-chrome-extension.zip) |
-| 📂 **Unzipped (Browse Files)** | Browse or load directly in Chrome | [📂 Open Folder](https://github.com/ershivshankar/TestDown/tree/main/jarvistype-chrome-extension) |
+| Option | Description | Action |
+|--------|-------------|--------|
+| 📦 **Download ZIP** | Single compressed file | [⬇ Download ZIP](https://github.com/ershivshankar/TestDown/raw/main/jarvistype-chrome-extension.zip) |
+| 📂 **Open Folder** | Browse all files on GitHub | [📂 Open Folder](https://github.com/ershivshankar/TestDown/tree/main/jarvistype-chrome-extension) |
 
 ---
 
-## 🚀 How to Install the Extension
+## 🚀 How to Install in Chrome
 
-### Option A — From ZIP
-1. Download the ZIP above
-2. Extract it to any folder on your PC
-3. Open Chrome → `chrome://extensions`
-4. Enable **Developer Mode** (top-right toggle)
-5. Click **"Load unpacked"** → select the extracted `jarvistype-chrome-extension` folder
+### From ZIP
+1. Click **⬇ Download ZIP** above and extract it
+2. Open Chrome → go to `chrome://extensions`
+3. Enable **Developer Mode** (top-right toggle)
+4. Click **"Load unpacked"** → select the extracted `jarvistype-chrome-extension` folder
 
-### Option B — From Unzipped Folder
-1. Click **"Open Folder"** above and download/clone this repo
-2. Open Chrome → `chrome://extensions`
-3. Enable **Developer Mode**
-4. Click **"Load unpacked"** → select the `jarvistype-chrome-extension` folder
+### From Folder (Browse & Clone)
+1. Click **📂 Open Folder** above to browse the files on GitHub
+2. Clone or download individual files as needed
+3. Open Chrome → go to `chrome://extensions`
+4. Enable **Developer Mode**
+5. Click **"Load unpacked"** → select the `jarvistype-chrome-extension` folder
 
 ---
 
